@@ -44,7 +44,9 @@ client.on('ready', async () => {
 
 client.on('messageCreate', async message => {
     if (users_with_alters.includes(message.author.id) && emotes(message.content)) {
+        console.log('match ' + message.content);
         let alter_emote = emotes(message.content);
+        console.log(alter_emote);
         var alter_info = await connection.promise().query('select * from alters where emote = ? and uid = ?', [alter_emote[0], message.author.id]);
         if (alter_info[0].length > 0) {
             let webhook_channel;
@@ -60,7 +62,7 @@ client.on('messageCreate', async message => {
             }
             if (interaction.channel.type == ChannelType.GuildPrivateThread || interaction.channel.type == ChannelType.GuildPublicThread) {
                 let attachment = interaction.options.getAttachment('attachment');
-                if (message.content.replace(/^<a?:.+?:\d{18,20}>|\p{Extended_Pictographic}/gu, '') > 0) {
+                if (message.content.replace(alter_emote[0], '') > 0) {
                     if (attachment) {
                         if (alter_info[0][0].pfp) {
                             await webhook.send({ content: message.content.replace(/^<a?:.+?:\d{18,20}>|\p{Extended_Pictographic}/gu, ''), username: alter_info[0][0].name, avatarURL: alter_info[0][0].pfp, threadId: interaction.channel.id, files: [attachment] });

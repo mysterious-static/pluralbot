@@ -54,34 +54,34 @@ client.on('messageCreate', async message => {
         var alter_info = await connection.promise().query('select * from alters where emoji = ? and uid = ?', [alter_emote[0], message.author.id]);
         if (alter_info[0].length > 0) {
             let webhook_channel;
-            if (interaction.channel.type == ChannelType.GuildPrivateThread || interaction.channel.type == ChannelType.GuildPublicThread) {
-                webhook_channel = interaction.channel.parent;
+            if (message.channel.type == ChannelType.GuildPrivateThread || message.channel.type == ChannelType.GuildPublicThread) {
+                webhook_channel = message.channel.parent;
             } else {
-                webhook_channel = interaction.channel;
+                webhook_channel = message.channel;
             }
             const webhooks = await webhook_channel.fetchWebhooks();
             let webhook = webhooks.find(wh => wh.token);
             if (!webhook) {
                 webhook = await webhook_channel.createWebhook({ name: 'rrgbot' });
             }
-            if (interaction.channel.type == ChannelType.GuildPrivateThread || interaction.channel.type == ChannelType.GuildPublicThread) {
-                let attachment = interaction.options.getAttachment('attachment');
+            if (message.channel.type == ChannelType.GuildPrivateThread || message.channel.type == ChannelType.GuildPublicThread) {
+                let attachment = message.options.getAttachment('attachment');
                 if (message.content.replace(alter_emote[0], '') > 0) {
                     if (attachment) {
                         if (alter_info[0][0].pfp) {
-                            await webhook.send({ content: message.content.replace(alter_emote[0], ''), username: alter_info[0][0].name, avatarURL: alter_info[0][0].pfp, threadId: interaction.channel.id, files: [attachment] });
+                            await webhook.send({ content: message.content.replace(alter_emote[0], ''), username: alter_info[0][0].name, avatarURL: alter_info[0][0].pfp, threadId: message.channel.id, files: [attachment] });
                         } else {
-                            await webhook.send({ content: message.content.replace(alter_emote[0], ''), username: alter_info[0][0].name, threadId: interaction.channel.id, files: [attachment] });
+                            await webhook.send({ content: message.content.replace(alter_emote[0], ''), username: alter_info[0][0].name, threadId: message.channel.id, files: [attachment] });
                         }
                     } else {
                         if (alter_info[0][0].pfp) {
-                            await webhook.send({ content: message.content.replace(alter_emote[0], ''), username: alter_info[0][0].name, avatarURL: alter_info[0][0].pfp, threadId: interaction.channel.id });
+                            await webhook.send({ content: message.content.replace(alter_emote[0], ''), username: alter_info[0][0].name, avatarURL: alter_info[0][0].pfp, threadId: message.channel.id });
                         } else {
-                            await webhook.send({ content: message.content.replace(alter_emote[0], ''), username: alter_info[0][0].name, threadId: interaction.channel.id });
+                            await webhook.send({ content: message.content.replace(alter_emote[0], ''), username: alter_info[0][0].name, threadId: message.channel.id });
                         }
                     }
                 } else {
-                    let attachment = interaction.options.getAttachment('attachment');
+                    let attachment = message.options.getAttachment('attachment');
                     if (attachment) {
                         if (alter_info[0][0].pfp) {
                             await webhook.send({ content: message.content.replace(alter_emote[0], ''), username: alter_info[0][0].name, avatarURL: alter_info[0][0].pfp, files: [attachment] });

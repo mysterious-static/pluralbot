@@ -15,7 +15,7 @@ var connection = mysql.createConnection({
 connection.connect();
 console.log(process.env.app_token);
 client.login(process.env.app_token);
-const emotes = (str) => str.match(/^<a?:.+?:\d{18-20}>|\p{Extended_Pictographic}/gu);
+const emotes = (str) => str.match(/^<a?:.+?:\d{18,20}>|\p{Extended_Pictographic}/gu);
 let users_with_alters = [];
 
 client.on('ready', async () => {

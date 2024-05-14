@@ -97,10 +97,11 @@ client.on('messageCreate', async message => {
                     }
                 }
             }
+            await message.delete();
         } else {
             console.log(message.content);
         }
-        await message.delete();
+
     } else {
         console.log('no match ' + message.content);
     }

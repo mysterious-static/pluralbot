@@ -94,12 +94,24 @@ client.on('messageCreate', async message => {
                     }
                 }
             } else {
-                let attachment = message.options.getAttachment('attachment');
-                if (attachment) {
+                let attachments = [];
+                if (message.attachments.size > 0) {
+                    attachments = Array.from(message.attachments);
+                    console.log(Array.from(message.attachments));
+                    // Works if one attachment.
+                    // Multiple attachments = array of arrays. Bot will break.
+                    let idx = 0;
+                    for (let attachment of attachments) {
+                        attachments[idx] = attachment[1];
+                        idx++;
+                    }
+                    attachments = attachments.filter(e => typeof (e) === 'object');
+                }
+                if (attachments.length > 0) {
                     if (alter_info[0][0].pfp) {
-                        await webhook.send({ content: message.content.replace(alter_emote[0], ''), username: alter_info[0][0].name, avatarURL: alter_info[0][0].pfp, files: [attachment] });
+                        await webhook.send({ content: message.content.replace(alter_emote[0], ''), username: alter_info[0][0].name, avatarURL: alter_info[0][0].pfp, files: attachments });
                     } else {
-                        await webhook.send({ content: message.content.replace(alter_emote[0], ''), username: alter_info[0][0].name, files: [attachment] });
+                        await webhook.send({ content: message.content.replace(alter_emote[0], ''), username: alter_info[0][0].name, files: attachments });
                     }
                 } else {
                     if (alter_info[0][0].pfp) {

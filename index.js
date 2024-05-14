@@ -60,34 +60,38 @@ client.on('messageCreate', async message => {
             }
             if (interaction.channel.type == ChannelType.GuildPrivateThread || interaction.channel.type == ChannelType.GuildPublicThread) {
                 let attachment = interaction.options.getAttachment('attachment');
-                if (attachment) {
-                    if (alter_info[0][0].pfp) {
-                        await webhook.send({ content: message.content.replace(/^<a?:.+?:\d{18}>|\p{Extended_Pictographic}/gu, ''), username: alter_info[0][0].name, avatarURL: alter_info[0][0].pfp, threadId: interaction.channel.id, files: [attachment] });
+                if (message.content.replace(/^<a?:.+?:\d{18}>|\p{Extended_Pictographic}/gu, '') > 0) {
+                    if (attachment) {
+                        if (alter_info[0][0].pfp) {
+                            await webhook.send({ content: message.content.replace(/^<a?:.+?:\d{18}>|\p{Extended_Pictographic}/gu, ''), username: alter_info[0][0].name, avatarURL: alter_info[0][0].pfp, threadId: interaction.channel.id, files: [attachment] });
+                        } else {
+                            await webhook.send({ content: message.content.replace(/^<a?:.+?:\d{18}>|\p{Extended_Pictographic}/gu, ''), username: alter_info[0][0].name, threadId: interaction.channel.id, files: [attachment] });
+                        }
                     } else {
-                        await webhook.send({ content: message.content.replace(/^<a?:.+?:\d{18}>|\p{Extended_Pictographic}/gu, ''), username: alter_info[0][0].name, threadId: interaction.channel.id, files: [attachment] });
+                        if (alter_info[0][0].pfp) {
+                            await webhook.send({ content: message.content.replace(/^<a?:.+?:\d{18}>|\p{Extended_Pictographic}/gu, ''), username: alter_info[0][0].name, avatarURL: alter_info[0][0].pfp, threadId: interaction.channel.id });
+                        } else {
+                            await webhook.send({ content: message.content.replace(/^<a?:.+?:\d{18}>|\p{Extended_Pictographic}/gu, ''), username: alter_info[0][0].name, threadId: interaction.channel.id });
+                        }
                     }
                 } else {
-                    if (alter_info[0][0].pfp) {
-                        await webhook.send({ content: message.content.replace(/^<a?:.+?:\d{18}>|\p{Extended_Pictographic}/gu, ''), username: alter_info[0][0].name, avatarURL: alter_info[0][0].pfp, threadId: interaction.channel.id });
+                    let attachment = interaction.options.getAttachment('attachment');
+                    if (attachment) {
+                        if (alter_info[0][0].pfp) {
+                            await webhook.send({ content: message.content.replace(/^<a?:.+?:\d{18}>|\p{Extended_Pictographic}/gu, ''), username: alter_info[0][0].name, avatarURL: alter_info[0][0].pfp, files: [attachment] });
+                        } else {
+                            await webhook.send({ content: message.content.replace(/^<a?:.+?:\d{18}>|\p{Extended_Pictographic}/gu, ''), username: alter_info[0][0].name, files: [attachment] });
+                        }
                     } else {
-                        await webhook.send({ content: message.content.replace(/^<a?:.+?:\d{18}>|\p{Extended_Pictographic}/gu, ''), username: alter_info[0][0].name, threadId: interaction.channel.id });
+                        if (alter_info[0][0].pfp) {
+                            await webhook.send({ content: message.content.replace(/^<a?:.+?:\d{18}>|\p{Extended_Pictographic}/gu, ''), username: alter_info[0][0].name, avatarURL: alter_info[0][0].pfp });
+                        } else {
+                            await webhook.send({ content: message.content.replace(/^<a?:.+?:\d{18}>|\p{Extended_Pictographic}/gu, ''), username: alter_info[0][0].name });
+                        }
                     }
                 }
             } else {
-                let attachment = interaction.options.getAttachment('attachment');
-                if (attachment) {
-                    if (alter_info[0][0].pfp) {
-                        await webhook.send({ content: message.content.replace(/^<a?:.+?:\d{18}>|\p{Extended_Pictographic}/gu, ''), username: alter_info[0][0].name, avatarURL: alter_info[0][0].pfp, files: [attachment] });
-                    } else {
-                        await webhook.send({ content: message.content.replace(/^<a?:.+?:\d{18}>|\p{Extended_Pictographic}/gu, ''), username: alter_info[0][0].name, files: [attachment] });
-                    }
-                } else {
-                    if (alter_info[0][0].pfp) {
-                        await webhook.send({ content: message.content.replace(/^<a?:.+?:\d{18}>|\p{Extended_Pictographic}/gu, ''), username: alter_info[0][0].name, avatarURL: alter_info[0][0].pfp });
-                    } else {
-                        await webhook.send({ content: message.content.replace(/^<a?:.+?:\d{18}>|\p{Extended_Pictographic}/gu, ''), username: alter_info[0][0].name });
-                    }
-                }
+                log(message.content);
             }
             await message.delete();
         }

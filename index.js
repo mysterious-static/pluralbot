@@ -80,27 +80,27 @@ client.on('messageCreate', async message => {
                             await webhook.send({ content: message.content.replace(alter_emote[0], ''), username: alter_info[0][0].name, threadId: message.channel.id });
                         }
                     }
-                } else {
-                    let attachment = message.options.getAttachment('attachment');
-                    if (attachment) {
-                        if (alter_info[0][0].pfp) {
-                            await webhook.send({ content: message.content.replace(alter_emote[0], ''), username: alter_info[0][0].name, avatarURL: alter_info[0][0].pfp, files: [attachment] });
-                        } else {
-                            await webhook.send({ content: message.content.replace(alter_emote[0], ''), username: alter_info[0][0].name, files: [attachment] });
-                        }
-                    } else {
-                        if (alter_info[0][0].pfp) {
-                            await webhook.send({ content: message.content.replace(alter_emote[0], ''), username: alter_info[0][0].name, avatarURL: alter_info[0][0].pfp });
-                        } else {
-                            await webhook.send({ content: message.content.replace(alter_emote[0], ''), username: alter_info[0][0].name });
-                        }
-                    }
                 }
             } else {
-                log(message.content);
+                let attachment = message.options.getAttachment('attachment');
+                if (attachment) {
+                    if (alter_info[0][0].pfp) {
+                        await webhook.send({ content: message.content.replace(alter_emote[0], ''), username: alter_info[0][0].name, avatarURL: alter_info[0][0].pfp, files: [attachment] });
+                    } else {
+                        await webhook.send({ content: message.content.replace(alter_emote[0], ''), username: alter_info[0][0].name, files: [attachment] });
+                    }
+                } else {
+                    if (alter_info[0][0].pfp) {
+                        await webhook.send({ content: message.content.replace(alter_emote[0], ''), username: alter_info[0][0].name, avatarURL: alter_info[0][0].pfp });
+                    } else {
+                        await webhook.send({ content: message.content.replace(alter_emote[0], ''), username: alter_info[0][0].name });
+                    }
+                }
             }
-            await message.delete();
+        } else {
+            console.log(message.content);
         }
+        await message.delete();
     } else {
         console.log('no match ' + message.content);
     }

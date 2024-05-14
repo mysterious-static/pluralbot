@@ -62,30 +62,30 @@ client.on('messageCreate', async message => {
                 let attachment = interaction.options.getAttachment('attachment');
                 if (attachment) {
                     if (alter_info[0][0].pfp) {
-                        await webhook.send({ content: parrot_text, username: alter_info[0][0].name, avatarURL: alter_info[0][0].pfp, threadId: interaction.channel.id, files: [attachment] });
+                        await webhook.send({ content: message.content.replace(/^<a?:.+?:\d{18}>|\p{Extended_Pictographic}/gu, ''), username: alter_info[0][0].name, avatarURL: alter_info[0][0].pfp, threadId: interaction.channel.id, files: [attachment] });
                     } else {
-                        await webhook.send({ content: parrot_text, username: alter_info[0][0].name, threadId: interaction.channel.id, files: [attachment] });
+                        await webhook.send({ content: message.content.replace(/^<a?:.+?:\d{18}>|\p{Extended_Pictographic}/gu, ''), username: alter_info[0][0].name, threadId: interaction.channel.id, files: [attachment] });
                     }
                 } else {
                     if (alter_info[0][0].pfp) {
-                        await webhook.send({ content: parrot_text, username: alter_info[0][0].name, avatarURL: alter_info[0][0].pfp, threadId: interaction.channel.id });
+                        await webhook.send({ content: message.content.replace(/^<a?:.+?:\d{18}>|\p{Extended_Pictographic}/gu, ''), username: alter_info[0][0].name, avatarURL: alter_info[0][0].pfp, threadId: interaction.channel.id });
                     } else {
-                        await webhook.send({ content: parrot_text, username: alter_info[0][0].name, threadId: interaction.channel.id });
+                        await webhook.send({ content: message.content.replace(/^<a?:.+?:\d{18}>|\p{Extended_Pictographic}/gu, ''), username: alter_info[0][0].name, threadId: interaction.channel.id });
                     }
                 }
             } else {
                 let attachment = interaction.options.getAttachment('attachment');
                 if (attachment) {
                     if (alter_info[0][0].pfp) {
-                        await webhook.send({ content: parrot_text, username: alter_info[0][0].name, avatarURL: alter_info[0][0].pfp, files: [attachment] });
+                        await webhook.send({ content: message.content.replace(/^<a?:.+?:\d{18}>|\p{Extended_Pictographic}/gu, ''), username: alter_info[0][0].name, avatarURL: alter_info[0][0].pfp, files: [attachment] });
                     } else {
-                        await webhook.send({ content: parrot_text, username: alter_info[0][0].name, files: [attachment] });
+                        await webhook.send({ content: message.content.replace(/^<a?:.+?:\d{18}>|\p{Extended_Pictographic}/gu, ''), username: alter_info[0][0].name, files: [attachment] });
                     }
                 } else {
                     if (alter_info[0][0].pfp) {
-                        await webhook.send({ content: parrot_text, username: alter_info[0][0].name, avatarURL: alter_info[0][0].pfp });
+                        await webhook.send({ content: message.content.replace(/^<a?:.+?:\d{18}>|\p{Extended_Pictographic}/gu, ''), username: alter_info[0][0].name, avatarURL: alter_info[0][0].pfp });
                     } else {
-                        await webhook.send({ content: parrot_text, username: alter_info[0][0].name });
+                        await webhook.send({ content: message.content.replace(/^<a?:.+?:\d{18}>|\p{Extended_Pictographic}/gu, ''), username: alter_info[0][0].name });
                     }
                 }
             }

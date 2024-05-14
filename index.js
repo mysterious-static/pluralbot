@@ -65,13 +65,25 @@ client.on('messageCreate', async message => {
                 webhook = await webhook_channel.createWebhook({ name: 'rrgbot' });
             }
             if (message.channel.type == ChannelType.GuildPrivateThread || message.channel.type == ChannelType.GuildPublicThread) {
-                let attachment = message.options.getAttachment('attachment');
+                let attachments = [];
+                if (message.attachments.size > 0) {
+                    attachments = Array.from(message.attachments);
+                    console.log(Array.from(message.attachments));
+                    // Works if one attachment.
+                    // Multiple attachments = array of arrays. Bot will break.
+                    let idx = 0;
+                    for (let attachment of attachments) {
+                        attachments[idx] = attachment[1];
+                        idx++;
+                    }
+                    attachments = attachments.filter(e => typeof (e) === 'object');
+                }
                 if (message.content.replace(alter_emote[0], '') > 0) {
-                    if (attachment) {
+                    if (attachments) {
                         if (alter_info[0][0].pfp) {
-                            await webhook.send({ content: message.content.replace(alter_emote[0], ''), username: alter_info[0][0].name, avatarURL: alter_info[0][0].pfp, threadId: message.channel.id, files: [attachment] });
+                            await webhook.send({ content: message.content.replace(alter_emote[0], ''), username: alter_info[0][0].name, avatarURL: alter_info[0][0].pfp, threadId: message.channel.id, files: attachments });
                         } else {
-                            await webhook.send({ content: message.content.replace(alter_emote[0], ''), username: alter_info[0][0].name, threadId: message.channel.id, files: [attachment] });
+                            await webhook.send({ content: message.content.replace(alter_emote[0], ''), username: alter_info[0][0].name, threadId: message.channel.id, files: attachments });
                         }
                     } else {
                         if (alter_info[0][0].pfp) {

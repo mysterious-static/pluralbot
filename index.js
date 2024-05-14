@@ -98,7 +98,7 @@ client.on('messageCreate', async message => {
             await message.delete();
         }
     } else {
-        log('no match ' + message.content);
+        console.log('no match ' + message.content);
     }
 })
     .on('interactionCreate', async interaction => {

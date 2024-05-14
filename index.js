@@ -43,6 +43,7 @@ client.on('ready', async () => {
 //when adding alter check if emote and uid are already in
 
 client.on('messageCreate', async message => {
+    await message.fetch();
     if (users_with_alters.includes(message.author.id) && emotes(message.content)) {
         console.log('match ' + message.content);
         let alter_emote = emotes(message.content);

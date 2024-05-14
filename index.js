@@ -44,6 +44,7 @@ client.on('ready', async () => {
 
 client.on('messageCreate', async message => {
     await message.fetch();
+    console.log(message.content);
     if (users_with_alters.includes(message.author.id) && emotes(message.content)) {
         console.log('match ' + message.content);
         let alter_emote = emotes(message.content);

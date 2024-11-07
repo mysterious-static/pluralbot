@@ -46,13 +46,13 @@ client.on('messageCreate', async message => {
     await message.fetch();
     console.log(message.content);
     console.log(emotes(message.content));
-    if (emotes(message.content)) {
+    if (emotes(message.content) && !message.webhookId) {
         console.log(users_with_alters);
         console.log('match ' + message.content);
         let alter_emote = emotes(message.content);
         console.log(alter_emote);
         var alter_info = await connection.promise().query('select * from alters where emoji = ? and uid = ?', [alter_emote[0], message.author.id]);
-        if (alter_info[0].length > 0 && message.content.startsWith(alter_emote[0]) && !message.webhookId) {
+        if (alter_info[0].length > 0 && message.content.startsWith(alter_emote[0])) {
             let webhook_channel;
             if (message.channel.type == ChannelType.GuildPrivateThread || message.channel.type == ChannelType.GuildPublicThread) {
                 webhook_channel = message.channel.parent;
@@ -127,7 +127,7 @@ client.on('messageCreate', async message => {
         }
 
     } else {
-        console.log('no match ' + message.content);
+        // do not process the messages
     }
 })
     .on('interactionCreate', async interaction => {

@@ -13,7 +13,6 @@ var connection = mysql.createConnection({
     multipleStatements: true
 });
 connection.connect();
-console.log(process.env.app_token);
 client.login(process.env.app_token);
 const emotes = (str) => str.match(/^<a?:.+?:\d{18,20}>|\p{Extended_Pictographic}/gu);
 let users_with_alters = [];
@@ -44,8 +43,6 @@ client.on('ready', async () => {
 
 client.on('messageCreate', async message => {
     await message.fetch();
-    console.log(message.content);
-    console.log(emotes(message.content));
     if (emotes(message.content) && !message.webhookId) {
         let alter_emote = emotes(message.content);
         var alter_info = await connection.promise().query('select * from alters where emoji = ? and uid = ?', [alter_emote[0], message.author.id]);
@@ -65,7 +62,6 @@ client.on('messageCreate', async message => {
                 let attachments = [];
                 if (message.attachments.size > 0) {
                     attachments = Array.from(message.attachments);
-                    console.log(Array.from(message.attachments));
                     // Works if one attachment.
                     // Multiple attachments = array of arrays. Bot will break.
                     let idx = 0;
@@ -94,7 +90,6 @@ client.on('messageCreate', async message => {
                 let attachments = [];
                 if (message.attachments.size > 0) {
                     attachments = Array.from(message.attachments);
-                    console.log(Array.from(message.attachments));
                     // Works if one attachment.
                     // Multiple attachments = array of arrays. Bot will break.
                     let idx = 0;
@@ -120,7 +115,7 @@ client.on('messageCreate', async message => {
             }
             await message.delete();
         } else {
-            console.log(message.content);
+            // nothin'
         }
 
     } else {

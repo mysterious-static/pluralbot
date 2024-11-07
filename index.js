@@ -47,10 +47,7 @@ client.on('messageCreate', async message => {
     console.log(message.content);
     console.log(emotes(message.content));
     if (emotes(message.content) && !message.webhookId) {
-        console.log(users_with_alters);
-        console.log('match ' + message.content);
         let alter_emote = emotes(message.content);
-        console.log(alter_emote);
         var alter_info = await connection.promise().query('select * from alters where emoji = ? and uid = ?', [alter_emote[0], message.author.id]);
         if (alter_info[0].length > 0 && message.content.startsWith(alter_emote[0])) {
             let webhook_channel;

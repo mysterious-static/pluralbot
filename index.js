@@ -139,6 +139,6 @@ client.on('messageCreate', async message => {
                 users_with_alters.push(interaction.member.id);
             }
             await connection.promise().query('insert into alters (uid, emoji, name, pfp) values (?, ?, ?, ?)', [interaction.member.id, emoji, name, pfp]);
-            interaction.reply({ message: 'Registered.', ephemeral: true });
+            interaction.channel.send({ message: 'Registered.', ephemeral: true });
         }
     });

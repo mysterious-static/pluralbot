@@ -33,9 +33,19 @@ client.on('ready', async () => {
             option.setName('pfp')
                 .setDescription('URL to profile picture that the bot can access')
                 .setRequired(true));
+    let list = new SlashCommandBuilder().setName('list')
+        .setDescription('List your registered alters.');
+    let remove = new SlashCommandBuilder().setName('remove')
+        .setDescription('Remove an alter.')
+        .addStringOption(option =>
+            option.setName('name')
+                .setDescription('Name of the alter you want to remove (check with /list). Case sensitive.')
+                .setRequired(true));
     //todo be able to edit name emoji pfp via menu driven system
     await client.application.commands.set([
-        register.toJSON()]);
+        register.toJSON(),
+        list.toJSON(),
+        remove.toJSON()]);
     let users = await connection.promise().query('select distinct uid from alters');
     users_with_alters = users[0];
 })
@@ -56,7 +66,7 @@ client.on('messageCreate', async message => {
             const webhooks = await webhook_channel.fetchWebhooks();
             let webhook = webhooks.find(wh => wh.token);
             if (!webhook) {
-                webhook = await webhook_channel.createWebhook({ name: 'rrgbot' });
+                webhook = await webhook_channel.createWebhook({ name: 'pluralbot' });
             }
             if (message.channel.type == ChannelType.GuildPrivateThread || message.channel.type == ChannelType.GuildPublicThread) {
                 let attachments = [];
@@ -131,6 +141,17 @@ client.on('messageCreate', async message => {
                 users_with_alters.push(interaction.member.id);
             }
             await connection.promise().query('insert into alters (uid, emoji, name, pfp) values (?, ?, ?, ?)', [interaction.member.id, emoji, name, pfp]);
-            interaction.channel.send({ message: 'Registered.', ephemeral: true });
+            interaction.reply({ message: 'Registered.', ephemeral: true });
+        } else if (interaction.commandName == 'list') {
+            let alters = await connection.promise().query('select * from alters where uid = ?', [interaction.member.id]);
+            let msg = '```';
+            for (alter in alters[0]) {
+                msg = msg.concat(`\n${alter.name}`);
+            }
+            msg = msg.concat(`\n\`\`\``);
+            interaction.reply({ message: msg, ephemeral: true });
+        } else if (interaction.commandName == 'remove') {
+            await connection.promise().query('delete from alters where uid = ? and name = ?', [interaction.member.id, interaction.options.getString('name')]);
+            interaction.reply({ message: 'Removed alter (if exists).', ephemeral: true });
         }
     });

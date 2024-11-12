@@ -141,7 +141,7 @@ client.on('messageCreate', async message => {
                 users_with_alters.push(interaction.member.id);
             }
             await connection.promise().query('insert into alters (uid, emoji, name, pfp) values (?, ?, ?, ?)', [interaction.member.id, emoji, name, pfp]);
-            interaction.reply({ message: 'Registered.', ephemeral: true });
+            interaction.reply({ content: 'Registered.', ephemeral: true });
         } else if (interaction.commandName == 'list') {
             let alters = await connection.promise().query('select * from alters where uid = ?', [interaction.member.id]);
             let msg = '```';
@@ -150,9 +150,9 @@ client.on('messageCreate', async message => {
             }
             msg = msg.concat(`\n\`\`\``);
             console.log(msg);
-            interaction.reply({ message: msg, ephemeral: true });
+            interaction.reply({ content: msg, ephemeral: true });
         } else if (interaction.commandName == 'remove') {
             await connection.promise().query('delete from alters where uid = ? and name = ?', [interaction.member.id, interaction.options.getString('name')]);
-            interaction.reply({ message: 'Removed alter (if exists).', ephemeral: true });
+            interaction.reply({ content: 'Removed alter (if exists).', ephemeral: true });
         }
     });

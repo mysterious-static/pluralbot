@@ -145,7 +145,7 @@ client.on('messageCreate', async message => {
         } else if (interaction.commandName == 'list') {
             let alters = await connection.promise().query('select * from alters where uid = ?', [interaction.member.id]);
             let msg = '```';
-            for (const alter in alters[0]) {
+            for (const alter of alters[0]) {
                 msg = msg.concat(`\n${alter.name}`);
             }
             msg = msg.concat(`\n\`\`\``);

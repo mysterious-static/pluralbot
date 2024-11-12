@@ -55,7 +55,7 @@ client.on('messageCreate', async message => {
     await message.fetch();
     if (emotes(message.content) && !message.webhookId) {
         let alter_emote = emotes(message.content);
-        var alter_info = await connection.promise().query('select * from alters where emoji = ? and uid = ?', [alter_emote[0], message.author.id]);
+        let alter_info = await connection.promise().query('select * from alters where emoji = ? and uid = ?', [alter_emote[0], message.author.id]);
         if (alter_info[0].length > 0 && message.content.startsWith(alter_emote[0])) {
             let webhook_channel;
             if (message.channel.type == ChannelType.GuildPrivateThread || message.channel.type == ChannelType.GuildPublicThread) {

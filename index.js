@@ -149,6 +149,7 @@ client.on('messageCreate', async message => {
                 msg = msg.concat(`\n${alter.name}`);
             }
             msg = msg.concat(`\n\`\`\``);
+            console.log(msg);
             interaction.reply({ message: msg, ephemeral: true });
         } else if (interaction.commandName == 'remove') {
             await connection.promise().query('delete from alters where uid = ? and name = ?', [interaction.member.id, interaction.options.getString('name')]);

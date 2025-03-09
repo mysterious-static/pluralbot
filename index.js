@@ -128,17 +128,37 @@ client.on('messageCreate', async message => {
                     }
                     attachments = attachments.filter(e => typeof (e) === 'object');
                 }
-                if (attachments.length > 0) {
-                    if (alter_info[0][0].pfp) {
-                        await webhook.send({ content: message.content.replace(alter_emote[0], ''), username: alter_info[0][0].name, avatarURL: alter_info[0][0].pfp, files: attachments });
+                if (message.content.replace(alter_emote[0], '') > 0) {
+                    console.log(message.type);
+                    if (message.type == 'reply') {
+                        let messageReference = await message.getReference();
+                        if (attachments.length > 0) {
+                            if (alter_info[0][0].pfp) {
+                                await webhook.send({ content: `Reply to <#${messageReference.id}>: \n\n${message.content.replace(alter_emote[0], '')}`, username: alter_info[0][0].name, avatarURL: alter_info[0][0].pfp, files: attachments });
+                            } else {
+                                await webhook.send({ content: `Reply to <#${messageReference.id}>: \n\n${message.content.replace(alter_emote[0], '')}`, username: alter_info[0][0].name, files: attachments });
+                            }
+                        } else {
+                            if (alter_info[0][0].pfp) {
+                                await webhook.send({ content: `Reply to <#${messageReference.id}>: \n\n${message.content.replace(alter_emote[0], '')}`, username: alter_info[0][0].name, avatarURL: alter_info[0][0].pfp });
+                            } else {
+                                await webhook.send({ content: `Reply to <#${messageReference.id}>: \n\n${message.content.replace(alter_emote[0], '')}`, username: alter_info[0][0].name });
+                            }
+                        }
                     } else {
-                        await webhook.send({ content: message.content.replace(alter_emote[0], ''), username: alter_info[0][0].name, files: attachments });
-                    }
-                } else {
-                    if (alter_info[0][0].pfp) {
-                        await webhook.send({ content: message.content.replace(alter_emote[0], ''), username: alter_info[0][0].name, avatarURL: alter_info[0][0].pfp });
-                    } else {
-                        await webhook.send({ content: message.content.replace(alter_emote[0], ''), username: alter_info[0][0].name });
+                        if (attachments.length > 0) {
+                            if (alter_info[0][0].pfp) {
+                                await webhook.send({ content: message.content.replace(alter_emote[0], ''), username: alter_info[0][0].name, avatarURL: alter_info[0][0].pfp, files: attachments });
+                            } else {
+                                await webhook.send({ content: message.content.replace(alter_emote[0], ''), username: alter_info[0][0].name, files: attachments });
+                            }
+                        } else {
+                            if (alter_info[0][0].pfp) {
+                                await webhook.send({ content: message.content.replace(alter_emote[0], ''), username: alter_info[0][0].name, avatarURL: alter_info[0][0].pfp });
+                            } else {
+                                await webhook.send({ content: message.content.replace(alter_emote[0], ''), username: alter_info[0][0].name });
+                            }
+                        }
                     }
                 }
             }

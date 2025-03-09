@@ -128,6 +128,7 @@ client.on('messageCreate', async message => {
                     attachments = attachments.filter(e => typeof (e) === 'object');
                 }
                 if (message.content.replace(alter_emote[0], '').length > 0) {
+                    console.log(message.type);
                     if (message.type == 'reply') {
                         let messageReference = await message.getReference();
                         console.log(messageReference);

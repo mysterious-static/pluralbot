@@ -134,15 +134,15 @@ client.on('messageCreate', async message => {
                         console.log(messageReference);
                         if (attachments.length > 0) {
                             if (alter_info[0][0].pfp) {
-                                await webhook.send({ content: `Reply to <#${messageReference.id}>: \n\n${message.content.replace(alter_emote[0], '')}`, username: alter_info[0][0].name, avatarURL: alter_info[0][0].pfp, files: attachments });
+                                await webhook.send({ content: `Reply to [${messageReference.author.name}](<https://discord.com/channels/${messageReference.guildId}/${messageReference.channelId}/${messageReference.id}>): \n\n${message.content.replace(alter_emote[0], '')}`, username: alter_info[0][0].name, avatarURL: alter_info[0][0].pfp, files: attachments });
                             } else {
-                                await webhook.send({ content: `Reply to <#${messageReference.id}>: \n\n${message.content.replace(alter_emote[0], '')}`, username: alter_info[0][0].name, files: attachments });
+                                await webhook.send({ content: `Reply to [${messageReference.author.name}](<https://discord.com/channels/${messageReference.guildId}/${messageReference.channelId}/${messageReference.id}>): \n\n${message.content.replace(alter_emote[0], '')}`, username: alter_info[0][0].name, files: attachments });
                             }
                         } else {
                             if (alter_info[0][0].pfp) {
-                                await webhook.send({ content: `Reply to <#${messageReference.id}>: \n\n${message.content.replace(alter_emote[0], '')}`, username: alter_info[0][0].name, avatarURL: alter_info[0][0].pfp });
+                                await webhook.send({ content: `Reply to [${messageReference.author.name}](<https://discord.com/channels/${messageReference.guildId}/${messageReference.channelId}/${messageReference.id}>): \n\n${message.content.replace(alter_emote[0], '')}`, username: alter_info[0][0].name, avatarURL: alter_info[0][0].pfp });
                             } else {
-                                await webhook.send({ content: `Reply to <#${messageReference.id}>: \n\n${message.content.replace(alter_emote[0], '')}`, username: alter_info[0][0].name });
+                                await webhook.send({ content: `Reply to [${messageReference.author.name}](<https://discord.com/channels/${messageReference.guildId}/${messageReference.channelId}/${messageReference.id}>): \n\n${message.content.replace(alter_emote[0], '')}`, username: alter_info[0][0].name });
                             }
                         }
                     } else {

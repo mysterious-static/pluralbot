@@ -84,7 +84,7 @@ client.on('messageCreate', async message => {
                 // use if message.type == 'reply' then await message.getReference() to get reply message if they ever implement webhook replies to messages
                 if (message.content.replace(alter_emote[0], '').length > 0) {
                     if (message.type == 19) {
-                        let messageReference = await message.getReference();
+                        let messageReference = await message.fetchReference();
                         if (attachments.length > 0) {
                             if (alter_info[0][0].pfp) {
                                 await webhook.send({ content: `Reply to <#${messageReference.id}>: \n\n${message.content.replace(alter_emote[0], '')}`, username: alter_info[0][0].name, avatarURL: alter_info[0][0].pfp, threadId: message.channel.id, files: attachments });
@@ -130,7 +130,7 @@ client.on('messageCreate', async message => {
                 if (message.content.replace(alter_emote[0], '').length > 0) {
                     console.log(message.type);
                     if (message.type == 19) {
-                        let messageReference = await message.getReference();
+                        let messageReference = await message.fetchReference();
                         console.log(messageReference);
                         if (attachments.length > 0) {
                             if (alter_info[0][0].pfp) {

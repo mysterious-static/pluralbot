@@ -83,7 +83,7 @@ client.on('messageCreate', async message => {
                 }
                 // use if message.type == 'reply' then await message.getReference() to get reply message if they ever implement webhook replies to messages
                 if (message.content.replace(alter_emote[0], '').length > 0) {
-                    if (message.type == 'reply') {
+                    if (message.type == 19) {
                         let messageReference = await message.getReference();
                         if (attachments.length > 0) {
                             if (alter_info[0][0].pfp) {
@@ -129,7 +129,7 @@ client.on('messageCreate', async message => {
                 }
                 if (message.content.replace(alter_emote[0], '').length > 0) {
                     console.log(message.type);
-                    if (message.type == 'reply') {
+                    if (message.type == 19) {
                         let messageReference = await message.getReference();
                         console.log(messageReference);
                         if (attachments.length > 0) {

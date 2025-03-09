@@ -81,18 +81,36 @@ client.on('messageCreate', async message => {
                     }
                     attachments = attachments.filter(e => typeof (e) === 'object');
                 }
+                // use if message.type == 'reply' then await message.getReference() to get reply message if they ever implement webhook replies to messages
                 if (message.content.replace(alter_emote[0], '') > 0) {
-                    if (attachments.length > 0) {
-                        if (alter_info[0][0].pfp) {
-                            await webhook.send({ content: message.content.replace(alter_emote[0], ''), username: alter_info[0][0].name, avatarURL: alter_info[0][0].pfp, threadId: message.channel.id, files: attachments });
+                    if (message.type == 'reply') {
+                        let messageReference = await message.getReference();
+                        if (attachments.length > 0) {
+                            if (alter_info[0][0].pfp) {
+                                await webhook.send({ content: `Reply to <#${messageReference.id}>: \n\n${message.content.replace(alter_emote[0], '')}`, username: alter_info[0][0].name, avatarURL: alter_info[0][0].pfp, threadId: message.channel.id, files: attachments });
+                            } else {
+                                await webhook.send({ content: `Reply to <#${messageReference.id}>: \n\n${message.content.replace(alter_emote[0], '')}`, username: alter_info[0][0].name, threadId: message.channel.id, files: attachments });
+                            }
                         } else {
-                            await webhook.send({ content: message.content.replace(alter_emote[0], ''), username: alter_info[0][0].name, threadId: message.channel.id, files: attachments });
+                            if (alter_info[0][0].pfp) {
+                                await webhook.send({ content: `Reply to <#${messageReference.id}>: \n\n${message.content.replace(alter_emote[0], '')}`, username: alter_info[0][0].name, avatarURL: alter_info[0][0].pfp, threadId: message.channel.id });
+                            } else {
+                                await webhook.send({ content: `Reply to <#${messageReference.id}>: \n\n${message.content.replace(alter_emote[0], '')}`, username: alter_info[0][0].name, threadId: message.channel.id });
+                            }
                         }
                     } else {
-                        if (alter_info[0][0].pfp) {
-                            await webhook.send({ content: message.content.replace(alter_emote[0], ''), username: alter_info[0][0].name, avatarURL: alter_info[0][0].pfp, threadId: message.channel.id });
+                        if (attachments.length > 0) {
+                            if (alter_info[0][0].pfp) {
+                                await webhook.send({ content: message.content.replace(alter_emote[0], ''), username: alter_info[0][0].name, avatarURL: alter_info[0][0].pfp, threadId: message.channel.id, files: attachments });
+                            } else {
+                                await webhook.send({ content: message.content.replace(alter_emote[0], ''), username: alter_info[0][0].name, threadId: message.channel.id, files: attachments });
+                            }
                         } else {
-                            await webhook.send({ content: message.content.replace(alter_emote[0], ''), username: alter_info[0][0].name, threadId: message.channel.id });
+                            if (alter_info[0][0].pfp) {
+                                await webhook.send({ content: message.content.replace(alter_emote[0], ''), username: alter_info[0][0].name, avatarURL: alter_info[0][0].pfp, threadId: message.channel.id });
+                            } else {
+                                await webhook.send({ content: message.content.replace(alter_emote[0], ''), username: alter_info[0][0].name, threadId: message.channel.id });
+                            }
                         }
                     }
                 }

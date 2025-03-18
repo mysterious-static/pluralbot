@@ -86,7 +86,7 @@ client.on('messageCreate', async message => {
                     if (message.type == 19) {
                         let messageReference = await message.fetchReference();
                         let embed = new EmbedBuilder()
-                            .setAuthor({ name: messageReference.author.username + '↩️', iconURL: messageReference.author.avatarURL() })
+                            .setAuthor({ name: messageReference.author.displayName + '↩️', iconURL: messageReference.author.avatarURL() })
                             .setDescription(`[Reply to:](<https://discord.com/channels/${messageReference.guildId}/${messageReference.channelId}/${messageReference.id}>) ${(messageReference.content.length > 97 ? messageReference.content.substring(0, 97) + '...' : messageReference.content)}`);
                         if (attachments.length > 0) {
 
@@ -138,7 +138,7 @@ client.on('messageCreate', async message => {
                         let messageReference = await message.fetchReference();
                         console.log(messageReference);
                         let embed = new EmbedBuilder()
-                            .setAuthor({ name: messageReference.author.username + '↩️', iconURL: messageReference.author.avatarURL() })
+                            .setAuthor({ name: messageReference.author.displayName + '↩️', iconURL: messageReference.author.avatarURL() })
                             .setDescription(`[Reply to:](<https://discord.com/channels/${messageReference.guildId}/${messageReference.channelId}/${messageReference.id}>) ${(messageReference.content.length > 97 ? substr(messageReference.content, 0, 96) + '...' : messageReference.content)}`);
                         if (attachments.length > 0) {
                             if (alter_info[0][0].pfp) {

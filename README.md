@@ -1,5 +1,6 @@
 __howto__
 
+- https://discord.com/oauth2/authorize?client_id=1239745462647521281
 - Use the `/register` app command to register alters and then just prefix your messages with the emoji you've assigned, this will work across any server the bot is in
 - Use `/list` and `/remove` to manage your system
 

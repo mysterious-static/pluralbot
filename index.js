@@ -139,7 +139,7 @@ client.on('messageCreate', async message => {
                         console.log(messageReference);
                         let embed = new EmbedBuilder()
                             .setAuthor({ name: messageReference.author.displayName + '↩️', iconURL: messageReference.author.avatarURL() })
-                            .setDescription(`[Reply to:](<https://discord.com/channels/${messageReference.guildId}/${messageReference.channelId}/${messageReference.id}>) ${(messageReference.content.length > 97 ? substr(messageReference.content, 0, 96) + '...' : messageReference.content)}`);
+                            .setDescription(`[Reply to:](<https://discord.com/channels/${messageReference.guildId}/${messageReference.channelId}/${messageReference.id}>) ${(messageReference.content.length > 97 ? messageReference.content.substr(0, 96) + '...' : messageReference.content)}`);
                         if (attachments.length > 0) {
                             if (alter_info[0][0].pfp) {
                                 await webhook.send({ content: message.content.replace(alter_emote[0], ''), embeds: [embed], username: alter_info[0][0].name, avatarURL: alter_info[0][0].pfp, files: attachments });

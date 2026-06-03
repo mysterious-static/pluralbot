@@ -20,32 +20,38 @@ let users_with_alters = [];
 client.on('ready', async () => {
 
     let register = new SlashCommandBuilder().setName('register')
-        .setDescription('Register a new alter.')
-        .addStringOption(option =>
-            option.setName('name')
-                .setDescription('How you would like this alter\'s name to appear')
-                .setRequired(true))
-        .addStringOption(option =>
-            option.setName('emoji')
-                .setDescription('Emoji prefix for this alter (start message with this emoji to automatically rewrite)')
-                .setRequired(true))
-        .addStringOption(option =>
-            option.setName('pfp')
-                .setDescription('URL to profile picture that the bot can access')
-                .setRequired(true));
+    .setDescription('Register a new alter.')
+    .addStringOption(option =>
+    option.setName('name')
+    .setDescription('How you would like this alter\'s name to appear')
+    .setRequired(true))
+    .addStringOption(option =>
+    option.setName('emoji')
+    .setDescription('Emoji prefix for this alter (start message with this emoji to automatically rewrite)')
+    .setRequired(true))
+    .addStringOption(option =>
+    option.setName('pfp')
+    .setDescription('URL to profile picture that the bot can access')
+    .setRequired(true));
     let list = new SlashCommandBuilder().setName('list')
-        .setDescription('List your registered alters.');
+    .setDescription('List your registered alters.');
     let remove = new SlashCommandBuilder().setName('remove')
-        .setDescription('Remove an alter.')
-        .addStringOption(option =>
-            option.setName('name')
-                .setDescription('Name of the alter you want to remove (check with /list). Case sensitive.')
-                .setRequired(true));
+    .setDescription('Remove an alter.')
+    .addStringOption(option =>
+    option.setName('name')
+    .setDescription('Name of the alter you want to remove (check with /list). Case sensitive.')
+    .setRequired(true));
+    let latch = new SlashCommandBuilder().setName('latch')
+    .setDescription('Enable latching to previously fronting member.')
+    .addBooleanOption(option =>
+    option.setName('enabled')
+    .setDescription('Whether or not to enable latching.')
+    .setRequired(true));
     //todo be able to edit name emoji pfp via menu driven system
     await client.application.commands.set([
         register.toJSON(),
-        list.toJSON(),
-        remove.toJSON()]);
+                                          list.toJSON(),
+                                          remove.toJSON()]);
     let users = await connection.promise().query('select distinct uid from alters');
     users_with_alters = users[0];
 })
@@ -53,7 +59,7 @@ client.on('ready', async () => {
 
 client.on('messageCreate', async message => {
     await message.fetch();
-    if (emotes(message.content) && !message.webhookId) {
+    if (emotes(message.content) && !message.webhookId && users_with_alters.includes(message.memberId)) {
         let alter_emote = emotes(message.content);
         console.log(alter_emote);
         let alter_info = await connection.promise().query('select * from alters where emoji = ? and uid = ?', [alter_emote[0], message.author.id]);
@@ -88,8 +94,8 @@ client.on('messageCreate', async message => {
                     if (message.type == 19) {
                         let messageReference = await message.fetchReference();
                         let embed = new EmbedBuilder()
-                            .setAuthor({ name: messageReference.author.displayName + '↩️', iconURL: messageReference.author.avatarURL() })
-                            .setDescription(`[Reply to:](<https://discord.com/channels/${messageReference.guildId}/${messageReference.channelId}/${messageReference.id}>) ${(messageReference.content.length > 97 ? messageReference.content.substring(0, 97) + '...' : messageReference.content)}`);
+                        .setAuthor({ name: messageReference.author.displayName + '↩️', iconURL: messageReference.author.avatarURL() })
+                        .setDescription(`[Reply to:](<https://discord.com/channels/${messageReference.guildId}/${messageReference.channelId}/${messageReference.id}>) ${(messageReference.content.length > 97 ? messageReference.content.substring(0, 97) + '...' : messageReference.content)}`);
                         if (attachments.length > 0) {
 
 
@@ -120,6 +126,7 @@ client.on('messageCreate', async message => {
                             }
                         }
                     }
+                    await message.delete();
                 }
             } else {
                 let attachments = [];
@@ -140,8 +147,8 @@ client.on('messageCreate', async message => {
                         let messageReference = await message.fetchReference();
                         console.log(messageReference);
                         let embed = new EmbedBuilder()
-                            .setAuthor({ name: messageReference.author.displayName + '↩️', iconURL: messageReference.author.avatarURL() })
-                            .setDescription(`[Reply to:](<https://discord.com/channels/${messageReference.guildId}/${messageReference.channelId}/${messageReference.id}>) ${(messageReference.content.length > 97 ? messageReference.content.substr(0, 96) + '...' : messageReference.content)}`);
+                        .setAuthor({ name: messageReference.author.displayName + '↩️', iconURL: messageReference.author.avatarURL() })
+                        .setDescription(`[Reply to:](<https://discord.com/channels/${messageReference.guildId}/${messageReference.channelId}/${messageReference.id}>) ${(messageReference.content.length > 97 ? messageReference.content.substr(0, 96) + '...' : messageReference.content)}`);
                         if (attachments.length > 0) {
                             if (alter_info[0][0].pfp) {
                                 await webhook.send({ content: message.content.replace(alter_emote[0], ''), embeds: [embed], username: alter_info[0][0].name, avatarURL: alter_info[0][0].pfp, files: attachments });
@@ -170,9 +177,10 @@ client.on('messageCreate', async message => {
                             }
                         }
                     }
+                    await message.delete();
                 }
             }
-            await message.delete();
+
         } else {
             // nothin'
         }
@@ -181,27 +189,27 @@ client.on('messageCreate', async message => {
         // do not process the messages
     }
 })
-    .on('interactionCreate', async interaction => {
-        if (interaction.commandName == 'register') {
-            let name = interaction.options.getString('name');
-            let pfp = interaction.options.getString('pfp');
-            let emoji = interaction.options.getString('emoji');
-            if (!users_with_alters.includes(interaction.member.id)) {
-                users_with_alters.push(interaction.member.id);
-            }
-            await connection.promise().query('insert into alters (uid, emoji, name, pfp) values (?, ?, ?, ?)', [interaction.member.id, emoji, name, pfp]);
-            interaction.reply({ content: 'Registered.', ephemeral: true });
-        } else if (interaction.commandName == 'list') {
-            let alters = await connection.promise().query('select * from alters where uid = ?', [interaction.member.id]);
-            let msg = '```';
-            for (const alter of alters[0]) {
-                msg = msg.concat(`\n${alter.name}`);
-            }
-            msg = msg.concat(`\n\`\`\``);
-            console.log(msg);
-            interaction.reply({ content: msg, ephemeral: true });
-        } else if (interaction.commandName == 'remove') {
-            await connection.promise().query('delete from alters where uid = ? and name = ?', [interaction.member.id, interaction.options.getString('name')]);
-            interaction.reply({ content: 'Removed alter (if exists).', ephemeral: true });
+.on('interactionCreate', async interaction => {
+    if (interaction.commandName == 'register') {
+        let name = interaction.options.getString('name');
+        let pfp = interaction.options.getString('pfp');
+        let emoji = interaction.options.getString('emoji');
+        if (!users_with_alters.includes(interaction.member.id)) {
+            users_with_alters.push(interaction.member.id);
         }
-    });
+        await connection.promise().query('insert into alters (uid, emoji, name, pfp) values (?, ?, ?, ?)', [interaction.member.id, emoji, name, pfp]);
+        interaction.reply({ content: 'Registered.', ephemeral: true });
+    } else if (interaction.commandName == 'list') {
+        let alters = await connection.promise().query('select * from alters where uid = ?', [interaction.member.id]);
+        let msg = '```';
+        for (const alter of alters[0]) {
+            msg = msg.concat(`\n${alter.name}`);
+        }
+        msg = msg.concat(`\n\`\`\``);
+        console.log(msg);
+        interaction.reply({ content: msg, ephemeral: true });
+    } else if (interaction.commandName == 'remove') {
+        await connection.promise().query('delete from alters where uid = ? and name = ?', [interaction.member.id, interaction.options.getString('name')]);
+        interaction.reply({ content: 'Removed alter (if exists).', ephemeral: true });
+    }
+});

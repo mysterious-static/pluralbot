@@ -62,22 +62,26 @@ client.on('messageCreate', async message => {
     await message.fetch();
     if (!message.webhookId && users_with_alters.has(message.member.id)) {
         let alter_info = null;
-        let alter_emote = emotes(message.content);
+        let alter_emote = null;
         if (emotes(message.content)) {
+            alter_emote = emotes(message.content);
             alter_info = await connection.promise().query('select * from alters where emoji = ? and uid = ?', [alter_emote[0], message.member.id]);
         }
+        const latch = null;
         if (!alter_info) {
             // Check latch
-            const latch = await connection.promise().query('select a.* from latch l join alters a on a.id = l.last_alter_id where l.uid = ? and l.enabled = true', [message.member.id]);
+            latch = await connection.promise().query('select a.* from latch l join alters a on a.id = l.last_alter_id where l.uid = ? and l.enabled = true', [message.member.id]);
             if (latch[0].length > 0) {
                 alter_info = latch;
             } else {
 
             }
         }
-        if (alter_info[0].length > 0 && message.content.startsWith(alter_emote[0])) {
+        if (alter_info[0].length > 0 && (message.content.startsWith(alter_emote[0]) || latch)) {
+            if (message.content.startsWith(alter_emote[0])) {
             await connection.promise().query('insert into latch (uid, last_alter) values (?, ?) on duplicate key update last_alter = values(last_alter)', [message.member.id, alter_info[0][0].id]);
             // TODO: Update the latch cache, when latching is implemented. Then we can make the query async.
+            }
             let webhook_channel;
             if (message.channel.type == ChannelType.GuildPrivateThread || message.channel.type == ChannelType.GuildPublicThread) {
                 webhook_channel = message.channel.parent;
@@ -113,29 +117,30 @@ client.on('messageCreate', async message => {
 
 
                             if (alter_info[0][0].pfp) {
-                                await webhook.send({ content: message.content.replace(alter_emote[0], ''), embeds: [embed], username: alter_info[0][0].name, avatarURL: alter_info[0][0].pfp, threadId: message.channel.id, files: attachments });
+                                
+                                await webhook.send({ content: (message.content.startsWith(alter_emote[0]) ? message.content.replace(alter_emote[0], '') : message.content), embeds: [embed], username: alter_info[0][0].name, avatarURL: alter_info[0][0].pfp, threadId: message.channel.id, files: attachments });
                             } else {
-                                await webhook.send({ content: message.content.replace(alter_emote[0], ''), embeds: [embed], username: alter_info[0][0].name, threadId: message.channel.id, files: attachments });
+                                await webhook.send({ content: (message.content.startsWith(alter_emote[0]) ? message.content.replace(alter_emote[0], '') : message.content), embeds: [embed], username: alter_info[0][0].name, threadId: message.channel.id, files: attachments });
                             }
                         } else {
                             if (alter_info[0][0].pfp) {
-                                await webhook.send({ content: message.content.replace(alter_emote[0], ''), embeds: [embed], username: alter_info[0][0].name, avatarURL: alter_info[0][0].pfp, threadId: message.channel.id });
+                                await webhook.send({ content: (message.content.startsWith(alter_emote[0]) ? message.content.replace(alter_emote[0], '') : message.content), embeds: [embed], username: alter_info[0][0].name, avatarURL: alter_info[0][0].pfp, threadId: message.channel.id });
                             } else {
-                                await webhook.send({ content: message.content.replace(alter_emote[0], ''), embeds: [embed], username: alter_info[0][0].name, threadId: message.channel.id });
+                                await webhook.send({ content: (message.content.startsWith(alter_emote[0]) ? message.content.replace(alter_emote[0], '') : message.content), embeds: [embed], username: alter_info[0][0].name, threadId: message.channel.id });
                             }
                         }
                     } else {
                         if (attachments.length > 0) {
                             if (alter_info[0][0].pfp) {
-                                await webhook.send({ content: message.content.replace(alter_emote[0], ''), username: alter_info[0][0].name, avatarURL: alter_info[0][0].pfp, threadId: message.channel.id, files: attachments });
+                                await webhook.send({ content: (message.content.startsWith(alter_emote[0]) ? message.content.replace(alter_emote[0], '') : message.content), username: alter_info[0][0].name, avatarURL: alter_info[0][0].pfp, threadId: message.channel.id, files: attachments });
                             } else {
-                                await webhook.send({ content: message.content.replace(alter_emote[0], ''), username: alter_info[0][0].name, threadId: message.channel.id, files: attachments });
+                                await webhook.send({ content: (message.content.startsWith(alter_emote[0]) ? message.content.replace(alter_emote[0], '') : message.content), username: alter_info[0][0].name, threadId: message.channel.id, files: attachments });
                             }
                         } else {
                             if (alter_info[0][0].pfp) {
-                                await webhook.send({ content: message.content.replace(alter_emote[0], ''), username: alter_info[0][0].name, avatarURL: alter_info[0][0].pfp, threadId: message.channel.id });
+                                await webhook.send({ content: (message.content.startsWith(alter_emote[0]) ? message.content.replace(alter_emote[0], '') : message.content), username: alter_info[0][0].name, avatarURL: alter_info[0][0].pfp, threadId: message.channel.id });
                             } else {
-                                await webhook.send({ content: message.content.replace(alter_emote[0], ''), username: alter_info[0][0].name, threadId: message.channel.id });
+                                await webhook.send({ content: (message.content.startsWith(alter_emote[0]) ? message.content.replace(alter_emote[0], '') : message.content), username: alter_info[0][0].name, threadId: message.channel.id });
                             }
                         }
                     }
@@ -164,29 +169,29 @@ client.on('messageCreate', async message => {
                         .setDescription(`[Reply to:](<https://discord.com/channels/${messageReference.guildId}/${messageReference.channelId}/${messageReference.id}>) ${(messageReference.content.length > 97 ? messageReference.content.substr(0, 96) + '...' : messageReference.content)}`);
                         if (attachments.length > 0) {
                             if (alter_info[0][0].pfp) {
-                                await webhook.send({ content: message.content.replace(alter_emote[0], ''), embeds: [embed], username: alter_info[0][0].name, avatarURL: alter_info[0][0].pfp, files: attachments });
+                                await webhook.send({ content: (message.content.startsWith(alter_emote[0]) ? message.content.replace(alter_emote[0], '') : message.content), embeds: [embed], username: alter_info[0][0].name, avatarURL: alter_info[0][0].pfp, files: attachments });
                             } else {
-                                await webhook.send({ content: message.content.replace(alter_emote[0], ''), embeds: [embed], username: alter_info[0][0].name, files: attachments });
+                                await webhook.send({ content: (message.content.startsWith(alter_emote[0]) ? message.content.replace(alter_emote[0], '') : message.content), embeds: [embed], username: alter_info[0][0].name, files: attachments });
                             }
                         } else {
                             if (alter_info[0][0].pfp) {
-                                await webhook.send({ content: message.content.replace(alter_emote[0], ''), embeds: [embed], username: alter_info[0][0].name, avatarURL: alter_info[0][0].pfp });
+                                await webhook.send({ content: (message.content.startsWith(alter_emote[0]) ? message.content.replace(alter_emote[0], '') : message.content), embeds: [embed], username: alter_info[0][0].name, avatarURL: alter_info[0][0].pfp });
                             } else {
-                                await webhook.send({ content: message.content.replace(alter_emote[0], ''), embeds: [embed], username: alter_info[0][0].name });
+                                await webhook.send({ content: (message.content.startsWith(alter_emote[0]) ? message.content.replace(alter_emote[0], '') : message.content), embeds: [embed], username: alter_info[0][0].name });
                             }
                         }
                     } else {
                         if (attachments.length > 0) {
                             if (alter_info[0][0].pfp) {
-                                await webhook.send({ content: message.content.replace(alter_emote[0], ''), username: alter_info[0][0].name, avatarURL: alter_info[0][0].pfp, files: attachments });
+                                await webhook.send({ content: (message.content.startsWith(alter_emote[0]) ? message.content.replace(alter_emote[0], '') : message.content), username: alter_info[0][0].name, avatarURL: alter_info[0][0].pfp, files: attachments });
                             } else {
-                                await webhook.send({ content: message.content.replace(alter_emote[0], ''), username: alter_info[0][0].name, files: attachments });
+                                await webhook.send({ content: (message.content.startsWith(alter_emote[0]) ? message.content.replace(alter_emote[0], '') : message.content), username: alter_info[0][0].name, files: attachments });
                             }
                         } else {
                             if (alter_info[0][0].pfp) {
-                                await webhook.send({ content: message.content.replace(alter_emote[0], ''), username: alter_info[0][0].name, avatarURL: alter_info[0][0].pfp });
+                                await webhook.send({ content: (message.content.startsWith(alter_emote[0]) ? message.content.replace(alter_emote[0], '') : message.content), username: alter_info[0][0].name, avatarURL: alter_info[0][0].pfp });
                             } else {
-                                await webhook.send({ content: message.content.replace(alter_emote[0], ''), username: alter_info[0][0].name });
+                                await webhook.send({ content: (message.content.startsWith(alter_emote[0]) ? message.content.replace(alter_emote[0], '') : message.content), username: alter_info[0][0].name });
                             }
                         }
                     }

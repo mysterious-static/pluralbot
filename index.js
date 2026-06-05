@@ -67,7 +67,7 @@ client.on('messageCreate', async message => {
             alter_emote = emotes(message.content);
             alter_info = await connection.promise().query('select * from alters where emoji = ? and uid = ?', [alter_emote[0], message.member.id]);
         }
-        const latch = null;
+        let latch = null;
         if (!alter_info) {
             // Check latch
             latch = await connection.promise().query('select a.* from latch l join alters a on a.id = l.last_alter_id where l.uid = ? and l.enabled = true', [message.member.id]);

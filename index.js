@@ -14,7 +14,7 @@ var connection = mysql.createConnection({
 });
 connection.connect();
 client.login(process.env.app_token);
-const emotes = (str) => str.match(/^<a?:.+?:\d{18,20}>|\p{Extended_Pictographic}/gu);
+const emotes = (str) => str.match(/^(<a?:.+?:\d{18,20}>|\p{Extended_Pictographic})/u);
 let users_with_alters = new Set();
 
 client.on('ready', async () => {
@@ -230,7 +230,7 @@ client.on('messageCreate', async message => {
         await connection.promise().query('delete from alters where uid = ? and name = ?', [interaction.member.id, interaction.options.getString('name')]);
         const remaining = await connection.promise().query('select count(*) as count from alters where uid = ?', [interaction.member.id]);
         if (remaining[0][0].count === 0) {
-            users_with_alters.delete(uid); // Update the in memory cache
+            users_with_alters.delete(message.member.id); // Update the in memory cache
         }
         interaction.reply({ content: 'Removed alter (if exists).', ephemeral: true });
     } else if (interaction.commandName == 'latch') {

@@ -107,7 +107,7 @@ client.on('messageCreate', async message => {
                     attachments = attachments.filter(e => typeof (e) === 'object');
                 }
                 // use if message.type == 'reply' then await message.getReference() to get reply message if they ever implement webhook replies to messages
-                if (message.content.replace(alter_emote[0], '').length > 0) {
+                if ((alter_emote !== null && message.content.replace(alter_emote[0], '').length > 0) || latch !== null) {
                     if (message.type == 19) {
                         let messageReference = await message.fetchReference();
                         let embed = new EmbedBuilder()
@@ -159,7 +159,7 @@ client.on('messageCreate', async message => {
                     }
                     attachments = attachments.filter(e => typeof (e) === 'object');
                 }
-                if (message.content.replace(alter_emote[0], '').length > 0) {
+                if ((alter_emote !== null && message.content.replace(alter_emote[0], '').length > 0) || latch !== null) {
                     console.log(message.type);
                     if (message.type == 19) {
                         let messageReference = await message.fetchReference();

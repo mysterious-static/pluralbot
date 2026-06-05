@@ -15,7 +15,7 @@ var connection = mysql.createConnection({
 connection.connect();
 client.login(process.env.app_token);
 const emotes = (str) => str.match(/^<a?:.+?:\d{18,20}>|\p{Extended_Pictographic}/gu);
-let users_with_alters = [];
+const users_with_alters = new Set();
 
 client.on('ready', async () => {
 
@@ -51,20 +51,34 @@ client.on('ready', async () => {
     await client.application.commands.set([
         register.toJSON(),
                                           list.toJSON(),
-                                          remove.toJSON()]);
+                                          remove.toJSON(),
+                                        latch.toJSON()]);
     let users = await connection.promise().query('select distinct uid from alters');
-    users_with_alters = users[0];
-})
+    users_with_alters = new Set(users[0].map(row => row.uid));
+});
 //when adding alter check if emote and uid are already in
 
 client.on('messageCreate', async message => {
     await message.fetch();
-    if (emotes(message.content) && !message.webhookId && users_with_alters.includes(message.memberId)) {
-        let alter_emote = emotes(message.content);
-        console.log(alter_emote);
-        let alter_info = await connection.promise().query('select * from alters where emoji = ? and uid = ?', [alter_emote[0], message.author.id]);
-        console.log(alter_info);
+    if (!message.webhookId && users_with_alters.has(message.member.id)) {
+        let alter_info = null;
+        let content = message.content;
+        if (emotes(message.content)) {
+            let alter_emote = emotes(message.content);
+            alter_info = await connection.promise().query('select * from alters where emoji = ? and uid = ?', [alter_emote[0], message.member.id]);
+        }
+        if (!alter_info) {
+            // Check latch
+            const latch = await connection.promise().query('select a.* from latch l join alters a on a.id = l.last_alter_id where l.uid = ? and l.enabled = true', [message.member.id]);
+            if (latch[0].length > 0) {
+                alter_info = latch;
+            } else {
+
+            }
+        }
         if (alter_info[0].length > 0 && message.content.startsWith(alter_emote[0])) {
+            await connection.promise.query('insert into latch (uid, last_alter) values (?, ?) on duplicate key update last_alter = values(last_alter)', [message.member.id, alter_info[0][0].id]);
+            // TODO: Update the latch cache, when latching is implemented. Then we can make the query async.
             let webhook_channel;
             if (message.channel.type == ChannelType.GuildPrivateThread || message.channel.type == ChannelType.GuildPublicThread) {
                 webhook_channel = message.channel.parent;
@@ -194,8 +208,8 @@ client.on('messageCreate', async message => {
         let name = interaction.options.getString('name');
         let pfp = interaction.options.getString('pfp');
         let emoji = interaction.options.getString('emoji');
-        if (!users_with_alters.includes(interaction.member.id)) {
-            users_with_alters.push(interaction.member.id);
+        if (!users_with_alters.has(interaction.member.id)) {
+            users_with_alters.add(interaction.member.id);
         }
         await connection.promise().query('insert into alters (uid, emoji, name, pfp) values (?, ?, ?, ?)', [interaction.member.id, emoji, name, pfp]);
         interaction.reply({ content: 'Registered.', ephemeral: true });
@@ -210,6 +224,14 @@ client.on('messageCreate', async message => {
         interaction.reply({ content: msg, ephemeral: true });
     } else if (interaction.commandName == 'remove') {
         await connection.promise().query('delete from alters where uid = ? and name = ?', [interaction.member.id, interaction.options.getString('name')]);
+        const remaining = await connection.promise().query('select count(*) as count from alters where uid = ?', [interaction.member.id]);
+        if (remaining[0][0].count === 0) {
+            users_with_alters.delete(uid); // Update the in memory cache
+        }
         interaction.reply({ content: 'Removed alter (if exists).', ephemeral: true });
+    } else if (interaction.commandName == 'latch') {
+        const enabled = interaction.options.getBoolean(enabled);
+        await connection.promise().query('insert into latch (uid, enabled) values (?, ?) on duplicate key update enabled = values(enabled)', [interaction.member.id, enabled]);
+        await interaction.reply({content: enabled ? 'Latch enabled.' : 'Latch disabled.', ephemeral: true});     
     }
 });

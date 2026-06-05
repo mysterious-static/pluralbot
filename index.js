@@ -78,7 +78,7 @@ client.on('messageCreate', async message => {
             }
         }
         if (alter_info[0].length > 0 && ((alter_emote !== null && message.content.startsWith(alter_emote[0])) || latch !== null)) {
-            if (alter_emote[0] && message.content.startsWith(alter_emote[0])) {
+            if (alter_emote !== null && message.content.startsWith(alter_emote[0])) {
             await connection.promise().query('insert into latch (uid, last_alter_id) values (?, ?) on duplicate key update last_alter_id = values(last_alter_id)', [message.member.id, alter_info[0][0].id]);
             // TODO: Update the latch cache, when latching is implemented. Then we can make the query async.
             }

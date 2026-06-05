@@ -230,7 +230,7 @@ client.on('messageCreate', async message => {
         }
         interaction.reply({ content: 'Removed alter (if exists).', ephemeral: true });
     } else if (interaction.commandName == 'latch') {
-        const enabled = interaction.options.getBoolean(enabled);
+        const enabled = interaction.options.getBoolean('enabled');
         await connection.promise().query('insert into latch (uid, enabled) values (?, ?) on duplicate key update enabled = values(enabled)', [interaction.member.id, enabled]);
         await interaction.reply({content: enabled ? 'Latch enabled.' : 'Latch disabled.', ephemeral: true});     
     }

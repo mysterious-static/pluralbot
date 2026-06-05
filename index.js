@@ -63,8 +63,8 @@ client.on('messageCreate', async message => {
     if (!message.webhookId && users_with_alters.has(message.member.id)) {
         let alter_info = null;
         let content = message.content;
+        let alter_emote = emotes(message.content);
         if (emotes(message.content)) {
-            let alter_emote = emotes(message.content);
             alter_info = await connection.promise().query('select * from alters where emoji = ? and uid = ?', [alter_emote[0], message.member.id]);
         }
         if (!alter_info) {
